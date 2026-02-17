@@ -1,13 +1,38 @@
 import { useState } from "react";
-import {User, LockKeyhole, Eye, EyeOff} from 'lucide-react'
-import {Link} from 'react-router-dom'
+import { User, LockKeyhole, Eye, EyeOff } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import apiClient from "../api/client";
+import { setAuthToken, setUserData } from "../auth/token";
+
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: connect backend
-    console.log("Login submitted");
+    setLoading(true);
+    setError("");
+    try {
+      const response = await apiClient("/auth/login", {
+        body: { email, password },
+      });
+      setAuthToken(response.token);
+      setUserData(response.user);
+
+      if (response.user.onboardingCompleted) {
+        navigate("/home");
+      } else {
+        navigate("/onboarding/language");
+      }
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,15 +55,19 @@ export default function Login() {
           Your Companion in Maternal & Child Health
         </p>
 
+        {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
+
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Username */}
+          {/* Username (Email) */}
           <div className="flex items-center bg-amber-50 rounded-full px-4 py-3">
             <span className="mr-3 text-gray-500"><User /></span>
             <input
-              type="text"
-              placeholder="Username"
+              type="email"
+              placeholder="Email"
               className="bg-transparent outline-none w-full text-sm"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -50,6 +79,8 @@ export default function Login() {
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               className="bg-transparent outline-none w-full text-sm"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
             <button
@@ -74,9 +105,10 @@ export default function Login() {
           {/* Login button */}
           <button
             type="submit"
-            className="w-full py-3 rounded-full bg-pink-200 hover:bg-pink-300 transition font-semibold text-gray-800 shadow-md"
+            disabled={loading}
+            className="w-full py-3 rounded-full bg-pink-200 hover:bg-pink-300 transition font-semibold text-gray-800 shadow-md disabled:bg-gray-200"
           >
-            Login
+            {loading ? "Logging In..." : "Login"}
           </button>
 
           {/* Divider */}
@@ -92,7 +124,7 @@ export default function Login() {
             className="w-full flex items-center justify-center gap-3 border rounded-xl py-3 text-sm font-medium shadow-sm hover:bg-gray-50"
           >
             <img
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/google.svg"
               alt="Google"
               className="w-5 h-5"
             />
