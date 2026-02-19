@@ -27,6 +27,7 @@ const emptyMotherForm = {
   height: "",
   weight: "",
   medicineAllergy: "",
+  foodAllergy: "",
   emergencyContact1: "",
   emergencyContact2: "",
 
@@ -139,6 +140,21 @@ function safeParseJson(value) {
   }
 }
 
+// blood group 
+const BLOOD_GROUPS = [
+  "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"
+];
+
+// validation functions
+const validatePhoneNumber = (value) => {
+  const phoneRegex = /^\d{10}$/;
+  return phoneRegex.test(value);
+};
+
+const validateNumber = (value) => {
+  return !isNaN(value) && value.trim() !== '';
+};
+
 function Field({
   label,
   value,
@@ -146,11 +162,15 @@ function Field({
   type = "text",
   placeholder,
   disabled,
+  error,
+  maxLength,
+  pattern,
 }) {
   return (
     <label className="block">
       <div className="flex items-end justify-between gap-3 mb-1.5">
         <span className="text-sm font-semibold text-gray-900">{label}</span>
+        {error && <span className="text-xs text-red-500">{error}</span>}
       </div>
       <input
         type={type}
@@ -158,45 +178,64 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
+        maxLength={maxLength}
+        pattern={pattern}
         className={[
           "w-full h-12 rounded-2xl px-4 text-sm",
           "bg-white border border-gray-200 text-gray-900",
           "focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-200",
           "disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed",
+          error ? "border-red-300 focus:ring-red-200" : "",
         ].join(" ")}
       />
     </label>
   );
 }
 
-function SelectField({ label, value, onChange, placeholder, disabled }) {
+function SelectField({ 
+  label, 
+  value, 
+  onChange, 
+  placeholder, 
+  disabled, 
+  options = [],
+  error 
+}) {
   return (
     <label className="block">
-      <div className="mb-1.5">
+      <div className="flex items-end justify-between gap-3 mb-1.5">
         <span className="text-sm font-semibold text-gray-900">{label}</span>
+        {error && <span className="text-xs text-red-500">{error}</span>}
       </div>
-      <input
-        type="text"
+      <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
         disabled={disabled}
         className={[
-          "w-full h-12 rounded-2xl px-4 text-sm",
+          "w-full h-12 rounded-2xl px-4 text-sm appearance-none",
           "bg-white border border-gray-200 text-gray-900",
           "focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-200",
           "disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed",
+          error ? "border-red-300 focus:ring-red-200" : "",
         ].join(" ")}
-      />
+      >
+        <option value="">{placeholder || "Select an option"}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }
 
-function TextAreaField({ label, value, onChange, placeholder, disabled, rows = 4 }) {
+function TextAreaField({ label, value, onChange, placeholder, disabled, rows = 4, error }) {
   return (
     <label className="block">
-      <div className="mb-1.5">
+      <div className="flex items-end justify-between gap-3 mb-1.5">
         <span className="text-sm font-semibold text-gray-900">{label}</span>
+        {error && <span className="text-xs text-red-500">{error}</span>}
       </div>
       <textarea
         value={value}
@@ -209,6 +248,7 @@ function TextAreaField({ label, value, onChange, placeholder, disabled, rows = 4
           "bg-white border border-gray-200 text-gray-900",
           "focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-200",
           "disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed",
+          error ? "border-red-300 focus:ring-red-200" : "",
         ].join(" ")}
       />
     </label>
@@ -266,6 +306,7 @@ export default function MotherForm() {
   const [savedData, setSavedData] = useState(null);
   const [editingSection, setEditingSection] = useState(null);
   const [toast, setToast] = useState(null);
+  const [errors, setErrors] = useState({});
   const toastTimerRef = useRef(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -297,11 +338,56 @@ export default function MotherForm() {
   };
 
   const setField = (key) => (value) => {
+    // clear error for field when user starts typing
+    if (errors[key]) {
+      setErrors(prev => ({ ...prev, [key]: null }));
+    }
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const validatePersonalSection = () => {
+    const newErrors = {};
+    
+    // val phone numbers (10 digits)
+    if (form.motherContact && !validatePhoneNumber(form.motherContact)) {
+      newErrors.motherContact = "Must be 10 digits";
+    }
+    
+    if (form.husbandContact && !validatePhoneNumber(form.husbandContact)) {
+      newErrors.husbandContact = "Must be 10 digits";
+    }
+    
+    if (form.emergencyContact1 && !validatePhoneNumber(form.emergencyContact1)) {
+      newErrors.emergencyContact1 = "Must be 10 digits";
+    }
+    
+    if (form.emergencyContact2 && !validatePhoneNumber(form.emergencyContact2)) {
+      newErrors.emergencyContact2 = "Must be 10 digits";
+    }
+    
+    // validate age 
+    if (form.age && !validateNumber(form.age)) {
+      newErrors.age = "Must be a number";
+    }
+    
+    // validate height 
+    if (form.height && !validateNumber(form.height)) {
+      newErrors.height = "Must be a number";
+    }
+    
+    // val weight
+    if (form.weight && !validateNumber(form.weight)) {
+      newErrors.weight = "Must be a number";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSectionEditToggle = (key) => {
     setEditingSection((current) => (current === key ? null : key));
+    // clear errors when toggling edit mode
+    setErrors({});
   };
 
   const handleSectionReset = (key) => {
@@ -314,11 +400,19 @@ export default function MotherForm() {
       });
       return updated;
     });
+    setErrors({});
     showToast("Section reset to last saved values.", "info");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // validate before submitting
+    if (!validatePersonalSection()) {
+      showToast("Please fix the errors before saving", "error");
+      return;
+    }
+    
     setIsSaving(true);
     const payload = { ...form };
 
@@ -420,42 +514,52 @@ export default function MotherForm() {
                     placeholder="Partner's full name"
                     disabled={!isSectionEditing("personal")} />
                   <Field
-                    label="Mother's Contact"
+                    label="Mother's Contact (10 digits)"
                     value={form.motherContact}
                     onChange={setField("motherContact")}
-                    placeholder="Your phone number"
-                    disabled={!isSectionEditing("personal")} />
+                    placeholder="10 digit mobile number"
+                    disabled={!isSectionEditing("personal")}
+                    maxLength={10}
+                    error={errors.motherContact}
+                    pattern="\d*" />
                   <Field
-                    label="Husband's Contact"
+                    label="Husband's Contact (10 digits)"
                     value={form.husbandContact}
                     onChange={setField("husbandContact")}
-                    placeholder="Partner's phone number"
-                    disabled={!isSectionEditing("personal")} />
+                    placeholder="10 digit mobile number"
+                    disabled={!isSectionEditing("personal")}
+                    maxLength={10}
+                    error={errors.husbandContact}
+                    pattern="\d*" />
                   <Field
-                    label="Age"
+                    label="Age (years)"
                     type="number"
                     value={form.age}
                     onChange={setField("age")}
                     placeholder="Your age"
-                    disabled={!isSectionEditing("personal")}/>
-                  <Field
+                    disabled={!isSectionEditing("personal")}
+                    error={errors.age} />
+                  <SelectField
                     label="Blood Group"
                     value={form.bloodGroup}
                     onChange={setField("bloodGroup")}
-                    placeholder="e.g., O+"
-                    disabled={!isSectionEditing("personal")} />
+                    placeholder="Select blood group"
+                    disabled={!isSectionEditing("personal")}
+                    options={BLOOD_GROUPS} />
                   <Field
-                    label="Height"
+                    label="Height (cm)"
                     value={form.height}
                     onChange={setField("height")}
-                    placeholder="e.g., 160 cm"
-                    disabled={!isSectionEditing("personal")} />
+                    placeholder="e.g., 165"
+                    disabled={!isSectionEditing("personal")}
+                    error={errors.height} />
                   <Field
-                    label="Weight"
+                    label="Weight (kg)"
                     value={form.weight}
                     onChange={setField("weight")}
-                    placeholder="e.g., 60 kg"
-                    disabled={!isSectionEditing("personal")} />
+                    placeholder="e.g., 60"
+                    disabled={!isSectionEditing("personal")}
+                    error={errors.weight} />
                   <Field
                     label="Medicine Allergy"
                     value={form.medicineAllergy}
@@ -469,17 +573,23 @@ export default function MotherForm() {
                     placeholder="Any food allergies"
                     disabled={!isSectionEditing("personal")} />
                   <Field
-                    label="Emergency Contact 1"
+                    label="Emergency Contact 1 (10 digits)"
                     value={form.emergencyContact1}
                     onChange={setField("emergencyContact1")}
-                    placeholder="Primary emergency contact"
-                    disabled={!isSectionEditing("personal")}  />
+                    placeholder="10 digit mobile number"
+                    disabled={!isSectionEditing("personal")}
+                    maxLength={10}
+                    error={errors.emergencyContact1}
+                    pattern="\d*" />
                   <Field
-                    label="Emergency Contact 2"
+                    label="Emergency Contact 2 (10 digits)"
                     value={form.emergencyContact2}
                     onChange={setField("emergencyContact2")}
-                    placeholder="Secondary emergency contact"
-                    disabled={!isSectionEditing("personal")} />
+                    placeholder="10 digit mobile number"
+                    disabled={!isSectionEditing("personal")}
+                    maxLength={10}
+                    error={errors.emergencyContact2}
+                    pattern="\d*" />
                 </div>
               </SectionCard>
             )}
@@ -770,7 +880,9 @@ export default function MotherForm() {
                 ? "bg-green-50/95 border-green-200 text-green-800"
                 : toast.variant === "info"
                   ? "bg-blue-50/95 border-blue-200 text-blue-800"
-                  : "bg-gray-50/95 border-gray-200 text-gray-800",
+                  : toast.variant === "error"
+                    ? "bg-red-50/95 border-red-200 text-red-800"
+                    : "bg-gray-50/95 border-gray-200 text-gray-800",
             ].join(" ")}
           >
             {toast.message}
