@@ -13,7 +13,7 @@ export default function ChatWidget() {
   const canSend = useMemo(() => input.trim().length > 0, [input]);
   const scrollRef = useRef(null);
 
-  // ✅ Load Lottie JSON from public/
+  // Load Lottie JSON from public/
   useEffect(() => {
     fetch("/bot.json")
       .then((res) => res.json())

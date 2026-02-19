@@ -1,68 +1,51 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Baby } from "lucide-react";
-//import { SlUserFemale } from "react-icons/sl";
+import apiClient from "../api/client";
+import { getUserData } from "../auth/token";
 
 export default function Home() {
   const nav = useNavigate();
   const [articles, setArticles] = useState([]);
   const [isLoadingArticles, setIsLoadingArticles] = useState(true);
-  const [userName] = useState("Jenni");
+  const [user, setUser] = useState(getUserData() || { name: "Mother" });
   const [lastMotherLog] = useState(":no data");
   const [lastBabyLog] = useState(":no data");
 
   useEffect(() => {
-    // Simulate API call for articles
-    const fetchArticles = async () => {
+    const fetchUserAndArticles = async () => {
       setIsLoadingArticles(true);
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/articles');
-      // const data = await response.json();
-      // setArticles(data);
-      
-      // Placeholder data for now
-      setTimeout(() => {
-        setArticles([
-  {
-    id: 1,
-    title: "Postpartum recovery: what to expect in the first weeks",
-    desc: "Understand normal physical and emotional changes after delivery, and learn when to seek medical support.",
-    tag: "Mother",
-    readTime: "5 min",
-  },
-  {
-    id: 2,
-    title: "Newborn sleep patterns in the first 3 months",
-    desc: "Learn how long babies sleep, common wake cycles, and simple tips to support healthy rest.",
-    tag: "Baby",
-    readTime: "4 min",
-  },
-  {
-    id: 3,
-    title: "Feeding your baby: breastfeeding and early nutrition",
-    desc: "A guide to feeding cues, nutrition needs, and common challenges in the early weeks.",
-    tag: "Mother + Baby",
-    readTime: "6 min",
-  },
-]);
+      try {
+        // Fetch user data
+        const userData = await apiClient("/auth/me");
+        setUser(userData);
 
+        // Fetch articles
+        const res = await fetch("http://localhost:5000/api/articles?max=7");
+        const data = await res.json();
+        setArticles(data);
+      } catch (err) {
+        console.error("Failed to load data", err);
+        setArticles([]);
+      } finally {
         setIsLoadingArticles(false);
-      }, 500);
+      }
     };
 
-    fetchArticles();
+    fetchUserAndArticles();
   }, []);
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-2">
       {/* Account for top navbar - add padding */}
       <div className="pt-16">
-        
+
         {/* Welcome Section with Heading and Description */}
-        <section className="bg-pink-200 rounded-3xl">
+        <section className="bg-[#e6edfc] rounded-3xl">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
-              Good to see you, {userName}!
+              Good to see you, {user.name}!
             </h1>
             <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl">
               Monitor your recovery and your baby's progress, one day at a time</p>
@@ -70,16 +53,16 @@ export default function Home() {
         </section>
 
         <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-8">
-          
+
           {/* Side-Scrolling Articles Section */}
           <section>
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg sm:text-xl text-gray-900">
-                  <span className="font-bold">Helpful reads</span> <br/> <span className="text-gray-500">for you and your baby</span>
+                  <span className="font-bold">Helpful reads</span> <br /> <span className="text-gray-500">for you and your baby</span>
                 </h2>
               </div>
-              <button 
+              <button
                 className="text-sm font-medium text-gray-600 hover:text-gray-900"
                 onClick={() => alert("View all articles")}
               >
@@ -101,19 +84,18 @@ export default function Home() {
             ) : articles.length > 0 ? (
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {articles.map((article) => (
-                  <article 
-                    key={article.id} 
-                    className="flex-shrink-0 w-72 group bg-white rounded-2xl p-5 hover:shadow-lg transition-all border border-gray-200 cursor-pointer"
+                  <article
+                    key={article.id}
+                    className="flex-shrink-0 w-64 group bg-white rounded-2xl p-5 hover:shadow-lg transition-all border border-gray-200 border-2 cursor-pointer"
                     onClick={() => alert(`Opening: ${article.title}`)}
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
-                        article.tag === "Mother" 
-                          ? "bg-pink-100 text-pink-700" 
-                          : article.tag === "Baby"
+                      <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${article.tag === "Mother"
+                        ? "bg-pink-100 text-pink-700"
+                        : article.tag === "Baby"
                           ? "bg-amber-100 text-amber-700"
                           : "bg-purple-100 text-purple-700"
-                      }`}>
+                        }`}>
                         {article.tag}
                       </span>
                       <span className="text-xs text-gray-500">{article.readTime}</span>
@@ -159,77 +141,72 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+
               {/* Mother Health Card */}
-              <button
-                onClick={() => nav("/mother")}
-                className="group text-left bg-pink-200 shadow-xl rounded-3xl p-6 hover:shadow-lg transition-all hover:border-pink-300"
-              >
+              <div className="group text-left bg-pink-200 shadow-xl rounded-3xl p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-200 group-hover:scale-105 transition-transform">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-200">
                     <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                   </div>
                 </div>
 
-                <h3 className="font-bold text-gray-900 text-xl mb-2">
-                  Your Recovery
-                </h3>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                <h3 className="font-bold text-gray-900 text-xl mb-2">Your Recovery</h3>
+                <p className="text-sm text-gray-700 mb-4 leading-relaxed">
                   Track your postpartum journey.
                 </p>
 
-                
-
                 <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                  <span className="text-xs text-gray-500">
-                    <span className="inline-block w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
-                    
+                  <span className="text-xs text-gray-600">
+                    <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
                     Last logged {lastMotherLog}
                   </span>
-                  <div className="flex items-center text-sm font-bold text-pink-600">
+
+                  {/* (2) Filled button */}
+                  <button
+                    onClick={() => nav("/mother")}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-600 text-white text-sm font-semibold shadow-sm hover:bg-pink-700 active:scale-[0.98] transition"
+                  >
                     Start logging
-                    <svg className="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
-                  </div>
+                  </button>
                 </div>
-              </button>
+              </div>
 
               {/* Baby Health Card */}
-              <button
-                onClick={() => nav("/baby")}
-                className="group text-left bg-yellow-100 shadow-xl rounded-3xl p-6 hover:shadow-lg transition-all hover:border-amber-300"
-              >
+              <div className="group text-left bg-yellow-100 shadow-xl rounded-3xl p-6">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-200 group-hover:scale-105 transition-transform">
-                    <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <Baby />
-                    </svg>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-200">
+                    <Baby className="w-8 h-8 text-white" />
                   </div>
                 </div>
 
-                <h3 className="font-bold text-gray-900 text-xl mb-2">
-                  Baby's Growth
-                </h3>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                <h3 className="font-bold text-gray-900 text-xl mb-2">Baby's Growth</h3>
+                <p className="text-sm text-gray-700 mb-4 leading-relaxed">
                   Monitor your little one's daily patterns.
                 </p>
 
-               
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200 s">
-                  <span className="text-xs text-gray-500">
-                    <span className="inline-block w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                  <span className="text-xs text-gray-600">
+                    <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
                     Last logged {lastBabyLog}
                   </span>
-                  <div className="flex items-center text-sm font-bold text-amber-600">
+
+                  {/* Filled button */}
+                  <button
+                    onClick={() => nav("/baby")}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-600 text-white text-sm font-semibold shadow-sm hover:bg-amber-700 active:scale-[0.98] transition"
+                  >
                     Start logging
-                    <svg className="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
-                  </div>
+                  </button>
                 </div>
-              </button>
+              </div>
             </div>
           </section>
 
@@ -247,7 +224,7 @@ export default function Home() {
             <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
-              
+
               <div className="relative z-10">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
@@ -255,7 +232,7 @@ export default function Home() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                     </svg>
                   </div>
-                  
+
                   <div className="flex-1">
                     <h3 className="text-white font-semibold text-lg mb-2">
                       Your Health Assistant
@@ -263,15 +240,15 @@ export default function Home() {
                     <p className="text-white/90 text-sm mb-4 leading-relaxed">
                       Get personalized insights based on your entries. We'll help you spot patterns, celebrate progress, and know when to check in with your healthcare provider.
                     </p>
-                    
+
                     <div className="flex flex-wrap gap-2">
-                      <button 
+                      <button
                         className="px-4 py-2 bg-white text-indigo-700 rounded-full text-sm font-semibold hover:bg-white/90 transition"
                         onClick={() => alert("Ask a question")}
                       >
                         Ask a Question
                       </button>
-                      <button 
+                      <button
                         className="px-4 py-2 bg-white/20 backdrop-blur text-white rounded-full text-sm font-semibold hover:bg-white/30 transition"
                         onClick={() => alert("View insights")}
                       >
