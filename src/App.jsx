@@ -9,6 +9,8 @@ import BabyAge from "./pages/onBoarding/steps/BabyAge";
 import FeedingMethod from "./pages/onBoarding/steps/Feedingmethod";
 import DeliveryType from "./pages/onBoarding/steps/Deliverytype";
 import HelpFocus from "./pages/onBoarding/steps/Helpfocus";
+import MotherForm from "./pages/MotherForm";
+import MotherMainDashboard from "./pages/MotherMainDashboard";
 
 function App() {
   return (
@@ -26,6 +28,9 @@ function App() {
       {/* Routes WITH BottomNav */}
       <Route element={<AppLayout />}>
         <Route path="/home" element={<Home />} />
+        <Route path="/mother" element={<MotherMainDashboard />} />
+        <Route path="/mother-main-dashboard" element={<MotherMainDashboard />} />
+        <Route path="/mother-form" element={<MotherForm />} />
         <Route path="/chat" element={<ChatWidget />} />
       </Route>
 
