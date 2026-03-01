@@ -29,6 +29,7 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path="/home" element={<Home />} />
         <Route path="/mother" element={<MotherMainDashboard />} />
+        <Route path="/baby" element={<BabyModule />} />
         <Route path="/mother-main-dashboard" element={<MotherMainDashboard />} />
         <Route path="/mother-form" element={<MotherForm />} />
         <Route path="/chat" element={<ChatWidget />} />
