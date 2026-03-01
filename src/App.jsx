@@ -11,7 +11,7 @@ import DeliveryType from "./pages/onBoarding/steps/Deliverytype";
 import HelpFocus from "./pages/onBoarding/steps/Helpfocus";
 import MotherForm from "./pages/MotherForm";
 import MotherMainDashboard from "./pages/MotherMainDashboard";
-import BabyModule from "../modules/babyModule/pages/BabyModule";
+import BabyModule from "./modules/babyModule/pages/BabyModule";
 function App() {
   return (
     <Routes>
