@@ -24,15 +24,17 @@ export default function HelpFocus() {
 
   const handleFinish = async () => {
     try {
-      await apiClient("/onboarding", {
-        body: {
+        const payload= {
           preferredLanguage: data.preferredLanguage,
           feedingType: data.feedingType,
           babyAgeWeeks: data.babyAgeWeeks,
           deliveryType: data.deliveryType,
           helpFocus: data.helpFocus,
-        },
-      });
+        };
+        await apiClient("/api/onboarding", {
+      method: "POST",
+      body: payload,
+    });
       nav("/home");
     } catch (err) {
       console.error("Onboarding failed:", err);
