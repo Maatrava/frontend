@@ -12,6 +12,8 @@ import HelpFocus from "./pages/onBoarding/steps/Helpfocus";
 import MotherForm from "./pages/MotherForm";
 import MotherMainDashboard from "./pages/MotherMainDashboard";
 import BabyModule from "./modules/babyModule/pages/BabyModule";
+import AppointmentForm from "./pages/AppointmentForm";
+
 function App() {
   return (
     <Routes>
@@ -32,6 +34,7 @@ function App() {
         <Route path="/baby" element={<BabyModule />} />
         <Route path="/mother-main-dashboard" element={<MotherMainDashboard />} />
         <Route path="/mother-form" element={<MotherForm />} />
+        <Route path="/appointments" element={<AppointmentForm />} />
         <Route path="/chat" element={<ChatWidget />} />
       </Route>
 
