@@ -8,6 +8,7 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,9 +19,10 @@ export default function Signup() {
     setLoading(true);
     setError("");
     try {
-      const response = await apiClient("/api/auth/signup", {
-        body: { name, email, password },
+      const response = await apiClient("/auth/signup", {
+        body: { name, email, password, phone },
       });
+
       setAuthToken(response.token);
       setUserData(response.user);
 
@@ -86,6 +88,18 @@ export default function Signup() {
             />
           </div>
 
+          {/* Phone */}
+          <div className="flex items-center bg-amber-50 rounded-full px-4 py-3">
+            <span className="mr-3 text-gray-500"><User className="w-4 h-4" /></span>
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              className="bg-transparent outline-none w-full text-sm"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
           {/* Password */}
           <div className="flex items-center bg-amber-50 rounded-full px-4 py-3">
             <span className="mr-3 text-gray-500"><LockKeyhole /></span>
@@ -128,7 +142,7 @@ export default function Signup() {
             className="w-full flex items-center justify-center gap-3 border rounded-xl py-3 text-sm font-medium shadow-sm hover:bg-gray-50"
           >
             <img
-              src="/google.png"
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/google.svg"
               alt="Google"
               className="w-5 h-5"
             />

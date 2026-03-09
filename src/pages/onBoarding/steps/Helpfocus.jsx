@@ -24,17 +24,17 @@ export default function HelpFocus() {
 
   const handleFinish = async () => {
     try {
-        const payload= {
-          preferredLanguage: data.preferredLanguage,
-          feedingType: data.feedingType,
-          babyAgeWeeks: data.babyAgeWeeks,
-          deliveryType: data.deliveryType,
-          helpFocus: data.helpFocus,
-        };
-        await apiClient("/api/onboarding", {
-      method: "POST",
-      body: payload,
-    });
+      const payload = {
+        preferredLanguage: data.preferredLanguage,
+        feedingType: data.feedingType,
+        babyAgeWeeks: data.babyAgeWeeks,
+        deliveryType: data.deliveryType,
+        helpFocus: data.helpFocus,
+      };
+      await apiClient("/api/onboarding", {
+        method: "POST",
+        body: payload,
+      });
       nav("/home");
     } catch (err) {
       console.error("Onboarding failed:", err);
@@ -99,7 +99,6 @@ export default function HelpFocus() {
                   animation: `slideIn 0.3s ease-out ${index * 0.08}s backwards`,
                 }}
               >
-                <span className="text-2xl">{option.icon}</span>
                 <span
                   className={`text-base font-medium ${selected === option.value ? "text-emerald-900" : "text-gray-700"
                     }`}
