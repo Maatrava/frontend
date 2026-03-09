@@ -3,7 +3,11 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Signin from "./pages/Signin";
 import ChatWidget from "./pages/ChatWidget";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 import AppLayout from "./layouts/AppLayout";
+
 import PreferredLanguage from "./pages/onBoarding/steps/PreferredLanguage";
 import BabyAge from "./pages/onBoarding/steps/BabyAge";
 import FeedingMethod from "./pages/onBoarding/steps/Feedingmethod";
@@ -23,6 +27,9 @@ function App() {
       <Route path="/onboarding/feeding" element={<FeedingMethod />} />
       <Route path="/onboarding/delivery" element={<DeliveryType />} />
       <Route path="/onboarding/helpfocus" element={<HelpFocus />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
 
 
       {/* Routes WITH BottomNav */}
@@ -33,6 +40,7 @@ function App() {
         <Route path="/mother-main-dashboard" element={<MotherMainDashboard />} />
         <Route path="/mother-form" element={<MotherForm />} />
         <Route path="/chat" element={<ChatWidget />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
 
       {/* Default */}
