@@ -7,6 +7,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import Insights from "./pages/Insights";
+import Articles from "./pages/Articles";
+import SavedArticles from "./pages/SavedArticles";
 import AppLayout from "./layouts/AppLayout";
 
 import PreferredLanguage from "./pages/onBoarding/steps/PreferredLanguage";
@@ -46,6 +48,8 @@ function App() {
         <Route path="/chat" element={<ChatWidget />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/insights" element={<Insights />} />
+        <Route path="/articles" element={<Articles />} />
+        <Route path="/saved-articles" element={<SavedArticles />} />
       </Route>
 
       {/* Default */}

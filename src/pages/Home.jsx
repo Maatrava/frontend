@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Baby, Bookmark, Heart, Sparkles, TrendingUp } from "lucide-react";
+import { Baby, Bookmark, Heart, Sparkles, TrendingUp, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import apiClient from "../api/client";
 import { getUserData } from "../auth/token";
 
@@ -11,6 +11,20 @@ export default function Home() {
   const [user, setUser] = useState(getUserData() || { name: "Mother" });
   const [lastMotherLog] = useState(":no data");
   const [lastBabyLog] = useState(":no data");
+  const [savedArticleIds, setSavedArticleIds] = useState([]);
+  const scrollRef = useRef(null);
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -340, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 340, behavior: "smooth" });
+    }
+  };
 
   // Removed insightsRef and scrollToInsights for separate page
 
@@ -25,6 +39,10 @@ export default function Home() {
         // Fetch articles from our DB
         const data = await apiClient("/articles");
         setArticles(data);
+
+        // Fetch saved articles
+        const savedData = await apiClient("/articles/saved");
+        setSavedArticleIds(savedData.map(s => s.articleId));
       } catch (err) {
         console.error("Failed to load data", err);
         setArticles([]);
@@ -38,21 +56,26 @@ export default function Home() {
 
   const handleSaveArticle = async (articleId) => {
     try {
-      await apiClient("/articles/save", {
+      const response = await apiClient("/articles/save", {
         body: { articleId }
       });
-      alert("Article saved!");
+
+      if (response.saved) {
+        setSavedArticleIds(prev => [...prev, articleId]);
+      } else {
+        setSavedArticleIds(prev => prev.filter(id => id !== articleId));
+      }
     } catch (err) {
-      alert(err || "Failed to save article");
+      alert(err || "Failed to update bookmark");
     }
   };
 
 
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2">
-      {/* Account for top navbar - add padding */}
-      <div className="pt-16">
+    <div className="bg-gray-50 p-2">
+      {/* Account for top navbar - removed manual pt-16 since AppLayout handles fixed header */}
+      <div>
 
         {/* Welcome Section with Heading and Description */}
         <section className="bg-[#e6edfc] rounded-3xl">
@@ -65,7 +88,7 @@ export default function Home() {
           </div>
         </section>
 
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-12">
+        <div className="py-6 space-y-12 px-4 sm:px-8">
 
           {/* Side-Scrolling Articles Section */}
           <section>
@@ -76,8 +99,8 @@ export default function Home() {
                 </h2>
               </div>
               <button
-                className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                onClick={() => alert("View all articles")}
+                className="text-sm font-bold text-pink-600 hover:text-pink-700 transition-colors"
+                onClick={() => nav("/articles")}
               >
                 See all
               </button>
@@ -85,62 +108,91 @@ export default function Home() {
 
             {isLoadingArticles ? (
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex-shrink-0 w-72 bg-white rounded-2xl p-5 border border-gray-200 animate-pulse">
-                    <div className="h-6 bg-gray-200 rounded w-20 mb-3"></div>
-                    <div className="h-5 bg-gray-200 rounded w-full mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex-shrink-0 w-80 bg-white rounded-3xl p-6 border border-gray-100 animate-pulse">
+                    <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+                    <div className="h-8 bg-gray-200 rounded w-full mb-4"></div>
+                    <div className="h-20 bg-gray-200 rounded w-full"></div>
                   </div>
                 ))}
               </div>
             ) : articles.length > 0 ? (
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                {articles.map((article) => (
-                  <article
-                    key={article._id}
-                    className="flex-shrink-0 w-64 group bg-white rounded-2xl p-5 hover:shadow-lg transition-all border border-gray-200 border-2 cursor-pointer flex flex-col"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${article.category === "Recovery"
-                        ? "bg-pink-100 text-pink-700"
-                        : article.category === "Feeding"
-                          ? "bg-amber-100 text-amber-700"
-                          : "bg-purple-100 text-purple-700"
-                        }`}>
-                        {article.category}
-                      </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSaveArticle(article._id);
-                        }}
-                        className="p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-pink-600"
-                      >
-                        <Bookmark className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    <div onClick={() => alert(`Opening: ${article.title}`)} className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors line-clamp-2">
-                        {article.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-                        {article.content}
-                      </p>
-
-                      <div className="flex items-center justify-end mt-4 pt-3 border-t border-gray-100">
-                        <div className="flex items-center text-sm font-medium text-gray-600 group-hover:text-gray-900">
-                          Read more
-                          <svg className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </div>
+              <div className="relative w-full">
+                <div
+                  ref={scrollRef}
+                  className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+                >
+                  {articles.map((article, idx) => (
+                    <article
+                      key={article._id}
+                      className={`flex-shrink-0 w-80 h-[400px] group bg-white rounded-3xl p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col cursor-default snap-start ${idx === articles.length - 1 ? 'mr-8' : ''}`}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${article.category === "Recovery"
+                          ? "bg-pink-100 text-pink-700"
+                          : article.category === "Feeding"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-purple-100 text-purple-700"
+                          }`}>
+                          {article.category}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSaveArticle(article._id);
+                          }}
+                          className={`p-1.5 rounded-full transition-colors ${savedArticleIds.includes(article._id)
+                              ? "bg-pink-50 text-pink-600"
+                              : "text-gray-400 hover:bg-gray-50 hover:text-pink-600"
+                            }`}
+                        >
+                          <Bookmark
+                            className="w-4 h-4"
+                            fill={savedArticleIds.includes(article._id) ? "currentColor" : "none"}
+                          />
+                        </button>
                       </div>
-                    </div>
-                  </article>
 
-                ))}
+                      <div className="flex-1 overflow-hidden">
+                        <h3 className="font-bold text-gray-900 mb-3 group-hover:text-pink-600 transition-colors line-clamp-2 text-lg leading-tight">
+                          {article.title}
+                        </h3>
+                        <p className="text-sm text-gray-500 leading-relaxed line-clamp-4">
+                          {article.content}
+                        </p>
+                      </div>
+
+                      <div className="mt-auto pt-6 border-t border-gray-50">
+                        <button
+                          onClick={() => article.url ? window.open(article.url, '_blank') : alert("Full article link coming soon!")}
+                          className="flex items-center text-sm font-bold text-gray-900 hover:text-pink-600 transition-colors gap-1.5 group/btn"
+                        >
+                          Read more
+                          <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+
+                <div className="flex justify-end gap-3 mt-4">
+                  <button
+                    onClick={scrollLeft}
+                    className="p-3 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-lg hover:border-pink-200 hover:text-pink-600 transition-all active:scale-95 text-gray-400"
+                    aria-label="Scroll left"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={scrollRight}
+                    className="p-3 bg-white border border-gray-200 rounded-full shadow-sm hover:shadow-lg hover:border-pink-200 hover:text-pink-600 transition-all active:scale-95 text-gray-400"
+                    aria-label="Scroll right"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="bg-white rounded-2xl p-8 border border-gray-200 text-center">
@@ -303,7 +355,7 @@ export default function Home() {
             </div>
           </section>
 
-        </main>
+        </div>
       </div>
 
       {/* Scrollbar Hide CSS */}

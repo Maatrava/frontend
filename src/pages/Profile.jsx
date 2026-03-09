@@ -66,7 +66,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-20 pb-12 px-4">
+        <div className="bg-gray-50 py-12 px-4">
             <div className="max-w-xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="bg-pink-50 p-8 text-center border-b border-pink-100">
                     <div className="w-20 h-20 bg-pink-500 rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4 shadow-lg shadow-pink-200">
@@ -203,4 +203,3 @@ export default function Profile() {
         </div>
     );
 }
-
