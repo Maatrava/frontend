@@ -8,6 +8,7 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,8 +20,9 @@ export default function Signup() {
     setError("");
     try {
       const response = await apiClient("/auth/signup", {
-        body: { name, email, password },
+        body: { name, email, password, phone },
       });
+
       setAuthToken(response.token);
       setUserData(response.user);
 
@@ -83,6 +85,18 @@ export default function Signup() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+            />
+          </div>
+
+          {/* Phone */}
+          <div className="flex items-center bg-amber-50 rounded-full px-4 py-3">
+            <span className="mr-3 text-gray-500"><User className="w-4 h-4" /></span>
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              className="bg-transparent outline-none w-full text-sm"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
             />
           </div>
 

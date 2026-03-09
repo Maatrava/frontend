@@ -309,6 +309,7 @@ export default function MotherForm() {
   const [errors, setErrors] = useState({});
   const toastTimerRef = useRef(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // navigates to main dashboard
   const handleBlueBoxClick = () => {
@@ -318,9 +319,10 @@ export default function MotherForm() {
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
     const parsed = raw ? safeParseJson(raw) : null;
-    const merged = parsed && typeof parsed === "object"
-      ? { ...emptyMotherForm, ...parsed }
-      : emptyMotherForm;
+    const merged =
+      parsed && typeof parsed === "object"
+        ? { ...emptyMotherForm, ...parsed }
+        : emptyMotherForm;
     setForm(merged);
     setSavedData(merged);
   }, []);
@@ -406,13 +408,13 @@ export default function MotherForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // validate before submitting
     if (!validatePersonalSection()) {
       showToast("Please fix the errors before saving", "error");
       return;
     }
-    
+
     setIsSaving(true);
     const payload = { ...form };
 
@@ -423,7 +425,7 @@ export default function MotherForm() {
       try {
         await apiClient("/mother-form", { body: payload });
       } catch {
-        // backend call 
+        // backend call (optional)
       }
 
       setEditingSection(null);
@@ -431,6 +433,59 @@ export default function MotherForm() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleSearch = () => {
+    const term = searchTerm.trim();
+    if (!term) {
+      showToast("Type something to search.", "info");
+      return;
+    }
+
+    const lower = term.toLowerCase();
+
+    // 1) keyword-based redirects (field names / labels)
+    const keywordMap = [
+      { tab: "personal", keywords: ["personal", "name", "husband", "contact", "blood", "group", "height", "weight", "allergy", "food", "medicine", "emergency", "age", "dob"] },
+      { tab: "delivery", keywords: ["delivery", "mode", "duration", "complication", "place", "time", "date"] },
+      { tab: "postnatal", keywords: ["postnatal", "bp", "pressure", "hemoglobin", "hb", "sugar", "blood sugar", "temp", "temperature", "pulse", "bleeding", "pain"] },
+      { tab: "mental", keywords: ["mental", "mood", "depression", "postpartum", "support", "emotional"] },
+      { tab: "breastfeeding", keywords: ["breast", "breastfeeding", "appetite", "sleep", "bowel", "urinary", "recovery"] },
+      { tab: "medical", keywords: ["medical", "history", "medication", "medications", "conditions", "allergies", "pregnancy"] },
+      { tab: "followup", keywords: ["follow", "follow-up", "follow up", "discharge", "doctor", "notes", "instructions", "next"] },
+    ];
+
+    let matchedTab = null;
+    for (const item of keywordMap) {
+      if (item.keywords.some((k) => lower.includes(k))) {
+        matchedTab = item.tab;
+        break;
+      }
+    }
+
+    // 2) value-based redirects (search inside saved/current entries)
+    if (!matchedTab) {
+      const entries = Object.entries(form || {});
+      for (const [key, value] of entries) {
+        if (!value) continue;
+        if (String(value).toLowerCase().includes(lower)) {
+          for (const [tabKey, fields] of Object.entries(SECTION_FIELDS)) {
+            if (fields.includes(key)) {
+              matchedTab = tabKey;
+              break;
+            }
+          }
+        }
+        if (matchedTab) break;
+      }
+    }
+
+    if (matchedTab) {
+      setActiveTab(matchedTab);
+      return;
+    }
+
+    showToast("No match found.", "info");
   };
 
   const isSectionEditing = (key) => editingSection === key;
@@ -452,6 +507,25 @@ export default function MotherForm() {
       <div className="pt-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
           <header className="space-y-4">
+            {/* search row */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by name, blood group, or contact"
+                  className="w-full h-11 rounded-2xl px-4 text-sm bg-white border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-200"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleSearch}
+                className="px-4 py-2 rounded-full bg-pink-600 text-white text-sm font-semibold shadow-sm hover:bg-pink-700 active:scale-95 transition"
+              >
+                Search
+              </button>
+            </div>
             {/* blue box - click to go to main dashboard */}
             <div 
               onClick={handleBlueBoxClick} 
@@ -471,7 +545,7 @@ export default function MotherForm() {
             </div>
 
             {/* nav tab */}
-            <nav className="bg-gray-100 rounded-3xl border border-gray-200 shadow-sm px-3 py-2 scrollbar-hide overflow-x-auto">
+            <nav className="bg-pink-50 rounded-3xl border border-gray-200 shadow-sm px-3 py-2 overflow-x-auto scrollbar-hide">
               <div className="flex items-center gap-2 min-w-max">
                 {tabs.map((tab) => (
                   <button
@@ -889,6 +963,7 @@ export default function MotherForm() {
           </div>
         </div>
       ) : null}
+
     </div>
   );
 }

@@ -3,7 +3,12 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Signin from "./pages/Signin";
 import ChatWidget from "./pages/ChatWidget";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
+import Insights from "./pages/Insights";
 import AppLayout from "./layouts/AppLayout";
+
 import PreferredLanguage from "./pages/onBoarding/steps/PreferredLanguage";
 import BabyAge from "./pages/onBoarding/steps/BabyAge";
 import FeedingMethod from "./pages/onBoarding/steps/Feedingmethod";
@@ -12,6 +17,8 @@ import HelpFocus from "./pages/onBoarding/steps/Helpfocus";
 import MotherForm from "./pages/MotherForm";
 import MotherMainDashboard from "./pages/MotherMainDashboard";
 import BabyModule from "./modules/babyModule/pages/BabyModule";
+import AppointmentForm from "./pages/AppointmentForm";
+
 function App() {
   return (
     <Routes>
@@ -23,6 +30,9 @@ function App() {
       <Route path="/onboarding/feeding" element={<FeedingMethod />} />
       <Route path="/onboarding/delivery" element={<DeliveryType />} />
       <Route path="/onboarding/helpfocus" element={<HelpFocus />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
 
 
       {/* Routes WITH BottomNav */}
@@ -32,7 +42,10 @@ function App() {
         <Route path="/baby" element={<BabyModule />} />
         <Route path="/mother-main-dashboard" element={<MotherMainDashboard />} />
         <Route path="/mother-form" element={<MotherForm />} />
+        <Route path="/appointments" element={<AppointmentForm />} />
         <Route path="/chat" element={<ChatWidget />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/insights" element={<Insights />} />
       </Route>
 
       {/* Default */}

@@ -12,6 +12,10 @@ export default function MotherMainDashboard() {
     nav("/mother-form");
   };
 
+  const handleAppointmentClick = () => {
+    nav("/appointments");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-2">
       <div className="pt-16">
@@ -50,7 +54,10 @@ export default function MotherMainDashboard() {
           {/* form and appo. */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* appointment box */}
-            <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-3xl p-6">
+            <div
+              onClick={handleAppointmentClick}
+              className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-3xl p-6 cursor-pointer hover:from-pink-100 hover:to-pink-200 transition-colors"
+            >
               <Calendar className="w-8 h-8 text-pink-600 mb-3" />
               <h3 className="font-semibold text-gray-800">Next Appointment</h3>
               <p className="text-sm text-gray-600 mt-1">No upcoming appointments</p>
