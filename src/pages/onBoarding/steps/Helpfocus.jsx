@@ -6,10 +6,10 @@ import ProgressBar from "../../../components/ProgressBar.jsx";
 import apiClient from "../../../api/client.js";
 
 const HELP_OPTIONS = [
-  { value: "baby-care", label: "Baby care" },
-  { value: "mother-recovery", label: "Mother's recovery" },
-  { value: "both", label: "Both" },
-  { value: "exploring", label: "Just exploring" },
+  { value: "baby-care", label: "Baby care", icon: "👶" },
+  { value: "mother-recovery", label: "Mother's recovery", icon: "👩‍⚕️" },
+  { value: "both", label: "Both", icon: "💖" },
+  { value: "exploring", label: "Just exploring", icon: "✨" },
 ];
 
 export default function HelpFocus() {
@@ -24,17 +24,17 @@ export default function HelpFocus() {
 
   const handleFinish = async () => {
     try {
-        const payload= {
-          preferredLanguage: data.preferredLanguage,
-          feedingType: data.feedingType,
-          babyAgeWeeks: data.babyAgeWeeks,
-          deliveryType: data.deliveryType,
-          helpFocus: data.helpFocus,
-        };
-        await apiClient("/api/onboarding", {
-      method: "POST",
-      body: payload,
-    });
+      const payload = {
+        preferredLanguage: data.preferredLanguage,
+        feedingType: data.feedingType,
+        babyAgeWeeks: data.babyAgeWeeks,
+        deliveryType: data.deliveryType,
+        helpFocus: data.helpFocus,
+      };
+      await apiClient("/api/onboarding", {
+        method: "POST",
+        body: payload,
+      });
       nav("/home");
     } catch (err) {
       console.error("Onboarding failed:", err);
