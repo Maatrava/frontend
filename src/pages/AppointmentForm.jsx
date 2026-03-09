@@ -84,9 +84,9 @@ export default function AppointmentForm() {
     setIsLoading(true);
     try {
       console.log("Fetching appointments from API...");
-      const response = await apiClient("/appointments");
+      const response = await apiClient("/api/appointments");
       console.log("API Response:", response);
-      
+
       // handle different response structures
       if (response?.data && Array.isArray(response.data)) {
         setAppointments(response.data);
@@ -102,7 +102,7 @@ export default function AppointmentForm() {
     } catch (error) {
       console.error("Error fetching appointments:", error);
       showToast("Using sample appointments while connecting to server", "info");
-    
+
       setAppointments(MOCK_APPOINTMENTS);
       setUseMockData(true);
     } finally {
@@ -149,7 +149,7 @@ export default function AppointmentForm() {
 
   const handleBook = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -158,10 +158,10 @@ export default function AppointmentForm() {
     try {
       if (useMockData) {
         await new Promise(resolve => setTimeout(resolve, 800));
-        
+
         if (editingId) {
-          setAppointments(prev => 
-            prev.map(appt => 
+          setAppointments(prev =>
+            prev.map(appt =>
               appt._id === editingId ? { ...form, _id: editingId } : appt
             )
           );
@@ -169,28 +169,28 @@ export default function AppointmentForm() {
         } else {
           const newAppointment = {
             ...form,
-            _id: Date.now().toString(), 
+            _id: Date.now().toString(),
           };
           setAppointments(prev => [newAppointment, ...prev]);
           showToast("Appointment booked successfully!", "success");
         }
       } else {
         if (editingId) {
-          await apiClient(`/appointments/${editingId}`, { 
-            method: "PUT", 
-            body: form 
+          await apiClient(`/api/appointments/${editingId}`, {
+            method: "PUT",
+            body: form
           });
           showToast("Appointment updated successfully!", "success");
         } else {
-          await apiClient("/appointments", { body: form });
+          await apiClient("/api/appointments", { body: form });
           showToast("Appointment booked successfully!", "success");
         }
-        await fetchAppointments(); 
+        await fetchAppointments();
       }
-      
+
       setForm(emptyAppointment);
       setEditingId(null);
-      
+
     } catch (error) {
       console.error("Error saving appointment:", error);
       showToast(error.message || "Failed to save appointment", "error");
@@ -216,26 +216,26 @@ export default function AppointmentForm() {
   const handleDelete = async (id) => {
     const ok = window.confirm("Are you sure you want to cancel this appointment?");
     if (!ok) return;
-    
+
     setIsSaving(true);
     try {
       if (useMockData) {
         await new Promise(resolve => setTimeout(resolve, 500));
         setAppointments(prev => prev.filter(appt => appt._id !== id));
-        
+
         if (editingId === id) {
           setEditingId(null);
           setForm(emptyAppointment);
         }
         showToast("Appointment cancelled successfully!", "success");
       } else {
-        await apiClient(`/appointments/${id}`, { method: "DELETE" });
-        
+        await apiClient(`/api/appointments/${id}`, { method: "DELETE" });
+
         if (editingId === id) {
           setEditingId(null);
           setForm(emptyAppointment);
         }
-        
+
         await fetchAppointments();
         showToast("Appointment cancelled successfully!", "success");
       }
@@ -289,7 +289,7 @@ export default function AppointmentForm() {
                   </p>
                 </div>
               </div>
-              
+
               {editingId && (
                 <button
                   type="button"
@@ -306,7 +306,7 @@ export default function AppointmentForm() {
                 <label className="block">
                   <div className="mb-1.5">
                     <span className="text-sm font-semibold text-gray-900">
-                      Appointment Date 
+                      Appointment Date
                     </span>
                   </div>
                   <input
@@ -321,7 +321,7 @@ export default function AppointmentForm() {
                 <label className="block">
                   <div className="mb-1.5">
                     <span className="text-sm font-semibold text-gray-900">
-                      Appointment Time 
+                      Appointment Time
                     </span>
                   </div>
                   <input
@@ -336,7 +336,7 @@ export default function AppointmentForm() {
                 <label className="block">
                   <div className="mb-1.5">
                     <span className="text-sm font-semibold text-gray-900">
-                      Doctor Name 
+                      Doctor Name
                     </span>
                   </div>
                   <input
@@ -352,7 +352,7 @@ export default function AppointmentForm() {
                 <label className="block">
                   <div className="mb-1.5">
                     <span className="text-sm font-semibold text-gray-900">
-                      Hospital 
+                      Hospital
                     </span>
                   </div>
                   <input
@@ -383,7 +383,7 @@ export default function AppointmentForm() {
                 <label className="block sm:col-span-2">
                   <div className="mb-1.5">
                     <span className="text-sm font-semibold text-gray-900">
-                      Contact Number 
+                      Contact Number
                     </span>
                   </div>
                   <input
@@ -401,7 +401,7 @@ export default function AppointmentForm() {
                 <label className="block sm:col-span-2">
                   <div className="mb-1.5">
                     <span className="text-sm font-semibold text-gray-900">
-                       Notes
+                      Notes
                     </span>
                   </div>
                   <textarea
@@ -415,8 +415,8 @@ export default function AppointmentForm() {
               </div>
 
               <div className="flex justify-center pt-4">
-                <PrimaryButton 
-                  type="submit" 
+                <PrimaryButton
+                  type="submit"
                   disabled={isSaving}
                   className="w-full sm:w-auto px-8 py-3 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-full transition-colors"
                 >

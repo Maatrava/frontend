@@ -47,6 +47,7 @@ const emptyMotherForm = {
   pulse: "",
   bleeding: "",
   painLevel: "",
+  weekOfPostpartum: "",
 
   // med history
   preExistingConditions: "",
@@ -56,8 +57,11 @@ const emptyMotherForm = {
 
   // mental & emotional health
   mood: "",
+  moodScore: "",
+  sleepHours: "",
   postpartumDepressionSigns: "",
   emotionalSupport: "",
+  dateRecorded: "",
 
   // breastfeeding & recovery
   breastfeedingStarted: "",
@@ -105,11 +109,15 @@ const SECTION_FIELDS = {
     "pulse",
     "bleeding",
     "painLevel",
+    "weekOfPostpartum",
   ],
   mental: [
     "mood",
+    "moodScore",
+    "sleepHours",
     "postpartumDepressionSigns",
     "emotionalSupport",
+    "dateRecorded",
   ],
   breastfeeding: [
     "breastfeedingStarted",
@@ -192,14 +200,14 @@ function Field({
   );
 }
 
-function SelectField({ 
-  label, 
-  value, 
-  onChange, 
-  placeholder, 
-  disabled, 
+function SelectField({
+  label,
+  value,
+  onChange,
+  placeholder,
+  disabled,
   options = [],
-  error 
+  error
 }) {
   return (
     <label className="block">
@@ -313,7 +321,7 @@ export default function MotherForm() {
 
   // navigates to main dashboard
   const handleBlueBoxClick = () => {
-    nav("/mother-main-dashboard"); 
+    nav("/mother-main-dashboard");
   };
 
   useEffect(() => {
@@ -349,39 +357,39 @@ export default function MotherForm() {
 
   const validatePersonalSection = () => {
     const newErrors = {};
-    
+
     // val phone numbers (10 digits)
     if (form.motherContact && !validatePhoneNumber(form.motherContact)) {
       newErrors.motherContact = "Must be 10 digits";
     }
-    
+
     if (form.husbandContact && !validatePhoneNumber(form.husbandContact)) {
       newErrors.husbandContact = "Must be 10 digits";
     }
-    
+
     if (form.emergencyContact1 && !validatePhoneNumber(form.emergencyContact1)) {
       newErrors.emergencyContact1 = "Must be 10 digits";
     }
-    
+
     if (form.emergencyContact2 && !validatePhoneNumber(form.emergencyContact2)) {
       newErrors.emergencyContact2 = "Must be 10 digits";
     }
-    
+
     // validate age 
     if (form.age && !validateNumber(form.age)) {
       newErrors.age = "Must be a number";
     }
-    
+
     // validate height 
     if (form.height && !validateNumber(form.height)) {
       newErrors.height = "Must be a number";
     }
-    
+
     // val weight
     if (form.weight && !validateNumber(form.weight)) {
       newErrors.weight = "Must be a number";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -423,9 +431,47 @@ export default function MotherForm() {
       setSavedData(payload);
 
       try {
-        await apiClient("/mother-form", { body: payload });
-      } catch {
+        await apiClient("/mother-form/save", { body: payload });
+
+        // Push to historical endpoints if relevant sections were active
+        if (activeTab === "postnatal" && payload.weekOfPostpartum && payload.bp && payload.hemoglobin && payload.weight) {
+          try {
+            // Parse bp systolic
+            const bpParts = payload.bp.split('/');
+            const bpSystolic = bpParts.length > 0 ? parseInt(bpParts[0]) : 120;
+            const hcg = parseFloat(payload.hemoglobin) || 12;
+            const wgt = parseFloat(payload.weight) || 60;
+
+            await apiClient("/mother-form/recovery", {
+              body: {
+                weekOfPostpartum: payload.weekOfPostpartum,
+                bpSystolic,
+                hemoglobin: hcg,
+                weight: wgt
+              }
+            });
+          } catch (err) {
+            console.error("Historical recovery save error:", err);
+          }
+        }
+
+        if (activeTab === "mental" && payload.sleepHours && payload.moodScore) {
+          try {
+            await apiClient("/mother-form/mental-health", {
+              body: {
+                sleepHours: parseFloat(payload.sleepHours) || 8,
+                moodScore: parseInt(payload.moodScore) || 5,
+                dateRecorded: payload.dateRecorded || new Date()
+              }
+            });
+          } catch (err) {
+            console.error("Historical mental save error:", err);
+          }
+        }
+
+      } catch (err) {
         // backend call (optional)
+        console.error(err);
       }
 
       setEditingSection(null);
@@ -527,8 +573,8 @@ export default function MotherForm() {
               </button>
             </div>
             {/* blue box - click to go to main dashboard */}
-            <div 
-              onClick={handleBlueBoxClick} 
+            <div
+              onClick={handleBlueBoxClick}
               className="bg-[#e6edfc] rounded-3xl px-5 sm:px-6 py-6 flex items-center justify-between cursor-pointer hover:bg-[#d8e3fa] transition-colors">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -538,7 +584,7 @@ export default function MotherForm() {
                   Welcome mommy! You're doing great every single day!!
                 </p>
               </div>
-              
+
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-pink-200 flex items-center justify-center flex-shrink-0">
                 <User className="w-6 h-6 sm:w-7 sm:h-7 text-gray-600" />
               </div>
@@ -694,7 +740,7 @@ export default function MotherForm() {
                     value={form.deliveryPlace}
                     onChange={setField("deliveryPlace")}
                     placeholder="Hospital / Clinic / Home"
-                    disabled={!isSectionEditing("delivery")}/>
+                    disabled={!isSectionEditing("delivery")} />
                   <Field
                     label="Mode"
                     value={form.deliveryMode}
@@ -712,7 +758,7 @@ export default function MotherForm() {
                     value={form.deliveryComplications}
                     onChange={setField("deliveryComplications")}
                     placeholder="Optional"
-                    disabled={!isSectionEditing("delivery")}/>
+                    disabled={!isSectionEditing("delivery")} />
                 </div>
               </SectionCard>
             )}
@@ -749,18 +795,24 @@ export default function MotherForm() {
                     value={form.temperature}
                     onChange={setField("temperature")}
                     placeholder="e.g., 98.6°F"
-                    disabled={!isSectionEditing("postnatal")}/>
+                    disabled={!isSectionEditing("postnatal")} />
                   <Field
                     label="Pulse"
                     value={form.pulse}
                     onChange={setField("pulse")}
                     placeholder="e.g., 78 bpm"
-                    disabled={!isSectionEditing("postnatal")}/>
+                    disabled={!isSectionEditing("postnatal")} />
                   <Field
                     label="Bleeding"
                     value={form.bleeding}
                     onChange={setField("bleeding")}
                     placeholder="e.g., Light, Moderate"
+                    disabled={!isSectionEditing("postnatal")} />
+                  <Field
+                    label="Week of Postpartum"
+                    value={form.weekOfPostpartum}
+                    onChange={setField("weekOfPostpartum")}
+                    placeholder="e.g., Week3"
                     disabled={!isSectionEditing("postnatal")} />
                   <div className="sm:col-span-2">
                     <TextAreaField
@@ -769,7 +821,7 @@ export default function MotherForm() {
                       onChange={setField("painLevel")}
                       placeholder="Describe your pain level, location, type, etc. (e.g., Mild cramping in lower abdomen, 3/10 pain)"
                       disabled={!isSectionEditing("postnatal")}
-                      rows={4}/>
+                      rows={4} />
                   </div>
                 </div>
               </SectionCard>
@@ -789,12 +841,32 @@ export default function MotherForm() {
                     value={form.mood}
                     onChange={setField("mood")}
                     placeholder="e.g., Good, Low"
-                    disabled={!isSectionEditing("mental")}/>
+                    disabled={!isSectionEditing("mental")} />
                   <Field
                     label="Emotional Support"
                     value={form.emotionalSupport}
                     onChange={setField("emotionalSupport")}
                     placeholder="e.g., Strong, Limited"
+                    disabled={!isSectionEditing("mental")} />
+                  <Field
+                    label="Mood Score (1-10)"
+                    type="number"
+                    value={form.moodScore}
+                    onChange={setField("moodScore")}
+                    placeholder="e.g., 8"
+                    disabled={!isSectionEditing("mental")} />
+                  <Field
+                    label="Sleep Hours"
+                    type="number"
+                    value={form.sleepHours}
+                    onChange={setField("sleepHours")}
+                    placeholder="e.g., 6"
+                    disabled={!isSectionEditing("mental")} />
+                  <Field
+                    label="Date Recorded"
+                    type="date"
+                    value={form.dateRecorded}
+                    onChange={setField("dateRecorded")}
                     disabled={!isSectionEditing("mental")} />
                   <div className="sm:col-span-2">
                     <TextAreaField
@@ -803,7 +875,7 @@ export default function MotherForm() {
                       onChange={setField("postpartumDepressionSigns")}
                       placeholder="Optional"
                       disabled={!isSectionEditing("mental")}
-                      rows={4}/>
+                      rows={4} />
                   </div>
                 </div>
               </SectionCard>
@@ -829,13 +901,13 @@ export default function MotherForm() {
                     value={form.appetite}
                     onChange={setField("appetite")}
                     placeholder="e.g., Good, Low"
-                    disabled={!isSectionEditing("breastfeeding")}/>
+                    disabled={!isSectionEditing("breastfeeding")} />
                   <Field
                     label="Sleep"
                     value={form.sleep}
                     onChange={setField("sleep")}
                     placeholder="e.g., 5–6 hours"
-                    disabled={!isSectionEditing("breastfeeding")}/>
+                    disabled={!isSectionEditing("breastfeeding")} />
                   <Field
                     label="Bowel & Urinary"
                     value={form.bowelUrinary}
@@ -881,13 +953,13 @@ export default function MotherForm() {
                     value={form.medications}
                     onChange={setField("medications")}
                     placeholder="Optional"
-                    disabled={!isSectionEditing("medical")}/>
+                    disabled={!isSectionEditing("medical")} />
                   <TextAreaField
                     label="Allergies"
                     value={form.allergies}
                     onChange={setField("allergies")}
                     placeholder="Optional"
-                    disabled={!isSectionEditing("medical")}/>
+                    disabled={!isSectionEditing("medical")} />
                 </div>
               </SectionCard>
             )}
