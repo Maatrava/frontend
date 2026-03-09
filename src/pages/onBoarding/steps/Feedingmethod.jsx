@@ -5,9 +5,9 @@ import { useOnboarding } from "../OnboardingContext";
 import ProgressBar from "../../../components/ProgressBar.jsx";
 
 const FEEDING_OPTIONS = [
-  { value: "breastfeeding", label: "Breastfeeding", icon: "🍼" },
-  { value: "formula", label: "Formula feeding", icon: "🥛" },
-  { value: "mixed", label: "Mixed", icon: "🥄" },
+  { value: "breastfeeding", label: "Breastfeeding" },
+  { value: "formula", label: "Formula feeding" },
+  { value: "mixed", label: "Mixed" },
 ];
 
 export default function FeedingMethod() {
@@ -71,7 +71,6 @@ export default function FeedingMethod() {
                   animation: `slideIn 0.3s ease-out ${index * 0.08}s backwards`,
                 }}
               >
-                <span className="text-2xl">{option.icon}</span>
                 <span
                   className={`text-base font-medium ${selected === option.value ? "text-blue-900" : "text-gray-700"
                     }`}

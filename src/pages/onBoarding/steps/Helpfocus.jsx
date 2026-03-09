@@ -6,10 +6,10 @@ import ProgressBar from "../../../components/ProgressBar.jsx";
 import apiClient from "../../../api/client.js";
 
 const HELP_OPTIONS = [
-  { value: "baby-care", label: "Baby care", icon: "👶" },
-  { value: "mother-recovery", label: "Mother's recovery", icon: "👩‍⚕️" },
-  { value: "both", label: "Both", icon: "💖" },
-  { value: "exploring", label: "Just exploring", icon: "✨" },
+  { value: "baby-care", label: "Baby care" },
+  { value: "mother-recovery", label: "Mother's recovery" },
+  { value: "both", label: "Both" },
+  { value: "exploring", label: "Just exploring" },
 ];
 
 export default function HelpFocus() {
@@ -99,7 +99,6 @@ export default function HelpFocus() {
                   animation: `slideIn 0.3s ease-out ${index * 0.08}s backwards`,
                 }}
               >
-                <span className="text-2xl">{option.icon}</span>
                 <span
                   className={`text-base font-medium ${selected === option.value ? "text-emerald-900" : "text-gray-700"
                     }`}
