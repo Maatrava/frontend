@@ -62,20 +62,17 @@ export default function DeliveryType() {
               <button
                 key={option.value}
                 onClick={() => handleSelect(option.value)}
-                className={`w-full h-16 rounded-2xl border-2 transition-all duration-200 active:scale-[0.98] flex items-center px-6 gap-3 ${
-                  selected === option.value
-                    ? "bg-yellow-50 border-yellow-300 shadow-lg shadow-purple-100/50"
-                    : "bg-white border-gray-200 hover:border-yellow-300 hover:shadow-md"
-                }`}
+                className={`w-full h-16 rounded-2xl border-2 transition-all duration-200 active:scale-[0.98] flex items-center px-6 gap-3 ${selected === option.value
+                  ? "bg-yellow-50 border-yellow-300 shadow-lg shadow-purple-100/50"
+                  : "bg-white border-gray-200 hover:border-yellow-300 hover:shadow-md"
+                  }`}
                 style={{
                   animation: `slideIn 0.3s ease-out ${index * 0.08}s backwards`,
                 }}
               >
-                <span className="text-2xl">{option.icon}</span>
                 <span
-                  className={`text-base font-medium ${
-                    selected === option.value ? "text-purple-900" : "text-gray-700"
-                  }`}
+                  className={`text-base font-medium ${selected === option.value ? "text-purple-900" : "text-gray-700"
+                    }`}
                 >
                   {option.label}
                 </span>
