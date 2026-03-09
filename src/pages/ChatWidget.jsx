@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import Lottie from "lottie-react";
+import apiClient from "../api/client";
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
@@ -28,19 +29,36 @@ export default function ChatWidget() {
     }
   }, [messages, open]);
 
-  const onSend = () => {
+  const onSend = async () => {
     const trimmed = input.trim();
     if (!trimmed) return;
 
     setMessages((prev) => [...prev, { from: "user", text: trimmed }]);
     setInput("");
 
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { from: "bot", text: "Got it. (Hook me to your backend/API next!)" },
-      ]);
-    }, 600);
+    // Add a temporary "thinking" message
+    setMessages((prev) => [...prev, { from: "bot", text: "..." }]);
+
+    try {
+      const response = await apiClient("/api/chat", {
+        method: "POST",
+        body: { message: trimmed },
+      });
+
+      setMessages((prev) => {
+        const newMsgs = [...prev];
+        // Replace the "..." message with actual response
+        newMsgs[newMsgs.length - 1] = { from: "bot", text: response.reply };
+        return newMsgs;
+      });
+    } catch (err) {
+      console.error("AI request failed:", err);
+      setMessages((prev) => {
+        const newMsgs = [...prev];
+        newMsgs[newMsgs.length - 1] = { from: "bot", text: "I'm having trouble connecting to the AI. Please try again later." };
+        return newMsgs;
+      });
+    }
   };
 
   return (
@@ -121,9 +139,8 @@ export default function ChatWidget() {
               <button
                 onClick={onSend}
                 disabled={!canSend}
-                className={`rounded-xl px-4 py-2 text-sm font-bold text-white ${
-                  canSend ? "bg-blue-600" : "bg-blue-600/50"
-                }`}
+                className={`rounded-xl px-4 py-2 text-sm font-bold text-white ${canSend ? "bg-blue-600" : "bg-blue-600/50"
+                  }`}
               >
                 Send
               </button>
