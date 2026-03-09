@@ -17,7 +17,7 @@ export default function Login() {
     setLoading(true);
     setError("");
     try {
-      const response = await apiClient("/api/auth/login", {
+      const response = await apiClient("/auth/login", {
         body: { email, password },
       });
       setAuthToken(response.token);
@@ -124,7 +124,7 @@ export default function Login() {
             className="w-full flex items-center justify-center gap-3 border rounded-xl py-3 text-sm font-medium shadow-sm hover:bg-gray-50"
           >
             <img
-              src="/google.png"
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/google.svg"
               alt="Google"
               className="w-5 h-5"
             />
