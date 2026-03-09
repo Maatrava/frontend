@@ -16,8 +16,3 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
-input::-ms-reveal,
-input::-ms-clear {
-  display: none;
-}
