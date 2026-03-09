@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Baby } from "lucide-react";
+import { Baby, Bookmark, Heart, Sparkles } from "lucide-react";
 import apiClient from "../api/client";
 import { getUserData } from "../auth/token";
 
@@ -20,9 +20,8 @@ export default function Home() {
         const userData = await apiClient("/auth/me");
         setUser(userData);
 
-        // Fetch articles
-        const res = await fetch("http://localhost:5000/api/articles?max=7");
-        const data = await res.json();
+        // Fetch articles from our DB
+        const data = await apiClient("/articles");
         setArticles(data);
       } catch (err) {
         console.error("Failed to load data", err);
@@ -34,6 +33,18 @@ export default function Home() {
 
     fetchUserAndArticles();
   }, []);
+
+  const handleSaveArticle = async (articleId) => {
+    try {
+      await apiClient("/articles/save", {
+        body: { articleId }
+      });
+      alert("Article saved!");
+    } catch (err) {
+      alert(err || "Failed to save article");
+    }
+  };
+
 
 
   return (
@@ -85,38 +96,48 @@ export default function Home() {
               <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {articles.map((article) => (
                   <article
-                    key={article.id}
-                    className="flex-shrink-0 w-64 group bg-white rounded-2xl p-5 hover:shadow-lg transition-all border border-gray-200 border-2 cursor-pointer"
-                    onClick={() => alert(`Opening: ${article.title}`)}
+                    key={article._id}
+                    className="flex-shrink-0 w-64 group bg-white rounded-2xl p-5 hover:shadow-lg transition-all border border-gray-200 border-2 cursor-pointer flex flex-col"
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${article.tag === "Mother"
+                      <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${article.category === "Recovery"
                         ? "bg-pink-100 text-pink-700"
-                        : article.tag === "Baby"
+                        : article.category === "Feeding"
                           ? "bg-amber-100 text-amber-700"
                           : "bg-purple-100 text-purple-700"
                         }`}>
-                        {article.tag}
+                        {article.category}
                       </span>
-                      <span className="text-xs text-gray-500">{article.readTime}</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveArticle(article._id);
+                        }}
+                        className="p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-pink-600"
+                      >
+                        <Bookmark className="w-4 h-4" />
+                      </button>
                     </div>
 
-                    <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors line-clamp-2">
-                      {article.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-                      {article.desc}
-                    </p>
+                    <div onClick={() => alert(`Opening: ${article.title}`)} className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors line-clamp-2">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                        {article.content}
+                      </p>
 
-                    <div className="flex items-center justify-end mt-4 pt-3 border-t border-gray-100">
-                      <div className="flex items-center text-sm font-medium text-gray-600 group-hover:text-gray-900">
-                        Read more
-                        <svg className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                      <div className="flex items-center justify-end mt-4 pt-3 border-t border-gray-100">
+                        <div className="flex items-center text-sm font-medium text-gray-600 group-hover:text-gray-900">
+                          Read more
+                          <svg className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </article>
+
                 ))}
               </div>
             ) : (
