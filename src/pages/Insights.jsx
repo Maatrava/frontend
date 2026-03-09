@@ -7,7 +7,7 @@ export default function Insights() {
     const nav = useNavigate();
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-20 pb-12 px-4 sm:px-6">
+        <div className="bg-gray-50 py-12 px-4 sm:px-6">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">

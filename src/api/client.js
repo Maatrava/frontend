@@ -1,6 +1,6 @@
 import { getAuthToken } from "../auth/token";
 
-const BASE_URL = "https://your-backend-name.onrender.com/api";
+const BASE_URL = "http://localhost:5000/api";
 
 const apiClient = async (endpoint, { body, ...customConfig } = {}) => {
     const token = getAuthToken();
