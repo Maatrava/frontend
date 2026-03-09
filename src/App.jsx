@@ -6,6 +6,7 @@ import ChatWidget from "./pages/ChatWidget";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
+import Insights from "./pages/Insights";
 import AppLayout from "./layouts/AppLayout";
 
 import PreferredLanguage from "./pages/onBoarding/steps/PreferredLanguage";
@@ -44,6 +45,7 @@ function App() {
         <Route path="/appointments" element={<AppointmentForm />} />
         <Route path="/chat" element={<ChatWidget />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/insights" element={<Insights />} />
       </Route>
 
       {/* Default */}
