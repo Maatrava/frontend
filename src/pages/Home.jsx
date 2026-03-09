@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Baby, Bookmark, Heart, Sparkles } from "lucide-react";
+import { Baby, Bookmark, Heart, Sparkles, TrendingUp } from "lucide-react";
 import apiClient from "../api/client";
 import { getUserData } from "../auth/token";
 
@@ -11,6 +11,8 @@ export default function Home() {
   const [user, setUser] = useState(getUserData() || { name: "Mother" });
   const [lastMotherLog] = useState(":no data");
   const [lastBabyLog] = useState(":no data");
+
+  // Removed insightsRef and scrollToInsights for separate page
 
   useEffect(() => {
     const fetchUserAndArticles = async () => {
@@ -63,7 +65,7 @@ export default function Home() {
           </div>
         </section>
 
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-8">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-12">
 
           {/* Side-Scrolling Articles Section */}
           <section>
@@ -271,7 +273,7 @@ export default function Home() {
                       </button>
                       <button
                         className="px-4 py-2 bg-white/20 backdrop-blur text-white rounded-full text-sm font-semibold hover:bg-white/30 transition"
-                        onClick={() => alert("View insights")}
+                        onClick={() => nav("/insights")}
                       >
                         View Insights
                       </button>
