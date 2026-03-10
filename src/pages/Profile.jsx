@@ -30,8 +30,8 @@ export default function Profile() {
                 };
                 setFormData(userData);
                 setOriginalData(userData);
-            } catch {
-                setError("Failed to load profile details");
+            } catch (err) {
+                setError(String(err) || "Failed to load profile details");
             }
         };
         fetchProfileData();
@@ -79,6 +79,7 @@ export default function Profile() {
         try {
             const updatePayload = {
                 name: formData.name,
+                email: formData.email,
                 phone: formData.phone,
                 profilePicture: formData.profilePicture
             };
@@ -92,13 +93,20 @@ export default function Profile() {
             const updatedData = {
                 ...formData,
                 name: response.name,
+                email: response.email,
                 phone: response.phone || "",
                 profilePicture: response.profilePicture || "",
                 password: ""
             };
             setFormData(updatedData);
             setOriginalData(updatedData);
-            setUserData({ ...getUserData(), name: response.name });
+            setUserData({
+                ...getUserData(),
+                name: response.name,
+                email: response.email,
+                phone: response.phone || "",
+                profilePicture: response.profilePicture || ""
+            });
             setMessage("Profile updated successfully!");
             setIsEditing(false);
         } catch (err) {
@@ -128,15 +136,10 @@ export default function Profile() {
                                     {userInitial}
                                 </div>
                             )}
-                            {isEditing && (
-                                <div className="absolute -bottom-2 -right-2 bg-white p-2.5 rounded-xl shadow-lg border border-gray-100 cursor-pointer hover:bg-gray-50 transition-all hover:scale-110 active:scale-95 group">
-                                    <Camera className="w-5 h-5 text-gray-600 group-hover:text-pink-500" />
-                                </div>
-                            )}
                         </div>
                         <div className="mb-4">
-                            <h1 className="text-3xl font-black text-white drop-shadow-sm">{formData.name || "Your Profile"}</h1>
-                            <p className="text-pink-50 font-medium opacity-90">{formData.email}</p>
+                            <h1 className="text-3xl font-black text-black drop-shadow-sm">{formData.name || "Your Profile"}</h1>
+                            <p className="text-black font-medium opacity-90">{formData.email}</p>
                         </div>
                     </div>
                 </div>
@@ -215,15 +218,17 @@ export default function Profile() {
                                 <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                     <Mail className="w-3.5 h-3.5" /> Email Address
                                 </label>
-                                <div className="border-b border-gray-100">
+                                <div className={`group transition-all duration-300 ${isEditing ? 'bg-gray-50 border-gray-200 focus-within:ring-4 focus-within:ring-pink-50 focus-within:border-pink-300 border rounded-2xl' : 'border-b border-gray-100'}`}>
                                     <input
                                         type="email"
+                                        name="email"
                                         value={formData.email}
-                                        readOnly
-                                        className="w-full px-4 py-3 bg-transparent outline-none font-bold text-gray-400 cursor-not-allowed"
+                                        onChange={handleChange}
+                                        readOnly={!isEditing}
+                                        placeholder="Email Address"
+                                        className={`w-full px-4 py-3 bg-transparent outline-none font-bold text-lg ${isEditing ? 'text-gray-900' : 'text-gray-800'}`}
                                     />
                                 </div>
-                                <p className="text-[10px] text-gray-400 px-4 mt-1 font-medium italic">Email cannot be changed contact support if needed</p>
                             </div>
 
                             <div className="space-y-1.5 px-1">
@@ -248,21 +253,6 @@ export default function Profile() {
                         <div className="space-y-6">
                             {isEditing ? (
                                 <>
-                                    <div className="space-y-1.5 px-1">
-                                        <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                                            <Camera className="w-3.5 h-3.5" /> Profile Image URL
-                                        </label>
-                                        <div className="bg-gray-50 border border-gray-200 rounded-2xl focus-within:ring-4 focus-within:ring-pink-50 focus-within:border-pink-300 transition-all duration-300">
-                                            <input
-                                                type="text"
-                                                name="profilePicture"
-                                                value={formData.profilePicture}
-                                                onChange={handleChange}
-                                                placeholder="https://images.unsplash.com/..."
-                                                className="w-full px-4 py-3 bg-transparent outline-none font-bold text-gray-900"
-                                            />
-                                        </div>
-                                    </div>
 
                                     <div className="space-y-1.5 px-1">
                                         <label className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
@@ -283,20 +273,7 @@ export default function Profile() {
                                 </>
                             ) : (
                                 <div className="h-full flex flex-col justify-center">
-                                    <div className="p-8 bg-gradient-to-br from-pink-50 to-rose-50 rounded-[2.5rem] border border-pink-100/50">
-                                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
-                                            <Lock className="w-6 h-6 text-pink-500" />
-                                        </div>
-                                        <h3 className="text-lg font-black text-pink-900 mb-2">Account Security</h3>
-                                        <p className="text-sm text-pink-700/80 leading-relaxed font-medium">
-                                            Your account is protected by industry-standard encryption.
-                                            We never share your private data with third parties.
-                                        </p>
-                                        <div className="mt-6 pt-6 border-t border-pink-200/50 flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                            <span className="text-xs font-bold text-pink-800 uppercase tracking-tighter">Verified Account</span>
-                                        </div>
-                                    </div>
+
                                 </div>
                             )}
                         </div>
@@ -304,19 +281,7 @@ export default function Profile() {
                 </div>
             </div>
 
-            {/* Help/Support Section */}
-            {!isEditing && (
-                <div className="bg-gray-900 rounded-3xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-                    <div className="relative z-10">
-                        <h3 className="text-xl font-bold mb-1">Need help with your account?</h3>
-                        <p className="text-gray-400 font-medium">Our support team is available 24/7 to assist you with any issues.</p>
-                    </div>
-                    <button className="relative z-10 bg-white text-gray-900 px-8 py-3 rounded-2xl font-black hover:bg-gray-100 transition-all active:scale-95 flex-shrink-0">
-                        Contact Support
-                    </button>
-                </div>
-            )}
+
         </div>
     );
 }
