@@ -6,7 +6,7 @@ export default function BabyModule() {
   const [activeView, setActiveView] = useState('dashboard');
 
   const renderView = () => {
-    switch(activeView) {
+    switch (activeView) {
       case 'dashboard':
         return (
           <div>
@@ -31,7 +31,7 @@ export default function BabyModule() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-2xl p-5 shadow-xl border border-amber-200">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center">
@@ -43,7 +43,7 @@ export default function BabyModule() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-2xl p-5 shadow-xl border border-green-200">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center">
@@ -76,7 +76,7 @@ export default function BabyModule() {
             </div>
           </div>
         );
-        
+
       case 'add-baby':
         return (
           <div>
@@ -86,7 +86,7 @@ export default function BabyModule() {
               </h2>
               <p className="text-gray-600">Enter your baby's information to get started</p>
             </div>
-            
+
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <form className="space-y-6" onSubmit={async (e) => {
                 e.preventDefault();
@@ -108,17 +108,18 @@ export default function BabyModule() {
                 console.log('Sending baby data:', babyData);
 
                 try {
-                  const response = await fetch('http://localhost:5000/api/baby', {
+                  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+                  const response = await fetch(`${baseUrl}/baby`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(babyData)
                   });
-                  
+
                   console.log('Response status:', response.status);
                   console.log('Response ok:', response.ok);
-                  
+
                   if (response.ok) {
                     alert('Baby added successfully!');
                     setActiveView('dashboard');
@@ -195,12 +196,12 @@ export default function BabyModule() {
                     </select>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Complications at Birth</label>
                   <textarea name="complications" rows={4} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500" placeholder="Any complications during birth..."></textarea>
                 </div>
-                
+
                 <div className="flex justify-end">
                   <button type="submit" className="bg-pink-500 text-white px-8 py-3 rounded-xl hover:bg-pink-600 font-semibold shadow-lg">
                     Add Baby
@@ -210,7 +211,7 @@ export default function BabyModule() {
             </div>
           </div>
         );
-        
+
       case 'growth':
         return (
           <div>
@@ -220,7 +221,7 @@ export default function BabyModule() {
               </h2>
               <p className="text-gray-600">Monitor your baby's physical development over time</p>
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white rounded-2xl shadow-xl p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Growth Record</h3>
@@ -238,14 +239,15 @@ export default function BabyModule() {
                   };
 
                   try {
-                    const response = await fetch('/api/baby/growth', {
+                    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+                    const response = await fetch(`${baseUrl}/baby/growth`, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
                       },
                       body: JSON.stringify(growthData)
                     });
-                    
+
                     if (response.ok) {
                       alert('Growth record added successfully!');
                       e.target.reset();
@@ -284,7 +286,7 @@ export default function BabyModule() {
                   </button>
                 </form>
               </div>
-              
+
               <div className="bg-white rounded-2xl shadow-xl p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Growth Chart</h3>
                 <div className="h-64 flex items-center justify-center text-gray-500 border-2 border-dashed border-gray-300 rounded-lg">
@@ -295,7 +297,7 @@ export default function BabyModule() {
             </div>
           </div>
         );
-        
+
       case 'vaccination':
         return (
           <div>
@@ -305,7 +307,7 @@ export default function BabyModule() {
               </h2>
               <p className="text-gray-600">Keep track of your baby's immunization timeline</p>
             </div>
-            
+
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
@@ -317,7 +319,7 @@ export default function BabyModule() {
                     Completed
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                   <div>
                     <h4 className="font-semibold text-gray-900">Hepatitis B</h4>
@@ -327,7 +329,7 @@ export default function BabyModule() {
                     Upcoming
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                   <div>
                     <h4 className="font-semibold text-gray-900">DTP Vaccine</h4>
@@ -341,7 +343,7 @@ export default function BabyModule() {
             </div>
           </div>
         );
-        
+
       case 'health-logs':
         return (
           <div>
@@ -351,12 +353,12 @@ export default function BabyModule() {
               </h2>
               <p className="text-gray-600">Track illnesses, medications, and health observations</p>
             </div>
-            
+
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <button className="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 font-semibold mb-4">
                 Add Health Log
               </button>
-              
+
               <div className="space-y-3">
                 <div className="p-4 bg-red-50 rounded-lg border border-red-200">
                   <div className="flex items-start gap-3">
@@ -370,7 +372,7 @@ export default function BabyModule() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center">
@@ -387,7 +389,7 @@ export default function BabyModule() {
             </div>
           </div>
         );
-        
+
       case 'health-reports':
         return (
           <div>
@@ -397,7 +399,7 @@ export default function BabyModule() {
               </h2>
               <p className="text-gray-600">Generate comprehensive health reports for your baby</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white rounded-2xl shadow-xl p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Growth Report</h3>
@@ -414,7 +416,7 @@ export default function BabyModule() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-2xl shadow-xl p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Vaccination Report</h3>
                 <div className="space-y-3">
@@ -433,7 +435,7 @@ export default function BabyModule() {
             </div>
           </div>
         );
-        
+
       default:
         return (
           <div>
@@ -465,7 +467,7 @@ export default function BabyModule() {
                 Monitor your baby's health and growth
               </p>
             </div>
-            <button 
+            <button
               onClick={() => setActiveView('add-baby')}
               className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-lg hover:from-pink-600 hover:to-rose-600 flex items-center gap-2 shadow-lg"
             >
@@ -494,11 +496,10 @@ export default function BabyModule() {
               <button
                 key={tab.id}
                 onClick={() => setActiveView(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all whitespace-nowrap text-sm ${
-                  activeView === tab.id
-                    ? 'bg-white text-pink-600 shadow-lg border-2 border-pink-200'
-                    : 'text-gray-600 hover:text-pink-600 hover:bg-white hover:bg-opacity-60'
-                }`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all whitespace-nowrap text-sm ${activeView === tab.id
+                  ? 'bg-white text-pink-600 shadow-lg border-2 border-pink-200'
+                  : 'text-gray-600 hover:text-pink-600 hover:bg-white hover:bg-opacity-60'
+                  }`}
               >
                 <tab.icon className="w-4 h-4" />
                 <span className="font-medium">{tab.label}</span>
@@ -507,7 +508,7 @@ export default function BabyModule() {
           </div>
         </div>
       </div>
-  
+
       {/* Content Area - Full Width (No Left/Right Padding) */}
       <div className="w-full">
         <div className="py-8">
