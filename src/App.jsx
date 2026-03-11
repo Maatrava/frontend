@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Signin from "./pages/Signin";
 import ChatWidget from "./pages/ChatWidget";
+import ChatHistory from "./pages/ChatHistory";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
@@ -46,6 +47,7 @@ function App() {
         <Route path="/mother-form" element={<MotherForm />} />
         <Route path="/appointments" element={<AppointmentForm />} />
         <Route path="/chat" element={<ChatWidget />} />
+        <Route path="/chat/history" element={<ChatHistory />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/articles" element={<Articles />} />
