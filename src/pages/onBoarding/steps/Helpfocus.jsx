@@ -31,7 +31,7 @@ export default function HelpFocus() {
         deliveryType: data.deliveryType,
         helpFocus: data.helpFocus,
       };
-      await apiClient("/api/onboarding", {
+      await apiClient("/onboarding", {
         method: "POST",
         body: payload,
       });
