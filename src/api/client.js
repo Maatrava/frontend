@@ -1,6 +1,6 @@
 import { getAuthToken } from "../auth/token";
 
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const BASE_URL = "https://fullstack-7ny8.onrender.com/api";
 
 const apiClient = async (endpoint, { body, ...customConfig } = {}) => {
     const token = getAuthToken();
