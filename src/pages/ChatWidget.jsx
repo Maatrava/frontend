@@ -1,8 +1,13 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Lottie from "lottie-react";
+import apiClient from "../api/client";
+import { History } from "lucide-react";
 
 export default function ChatWidget() {
-  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  // Open chat by default when component mounts
+  const [open, setOpen] = useState(true);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     { from: "bot", text: "Hi! I'm here to help. What would you like to know?" },
@@ -19,23 +24,6 @@ export default function ChatWidget() {
       .then((res) => res.json())
       .then(setBotAnim)
       .catch(console.error);
-
-    // Fetch History
-    const fetchHistory = async () => {
-      try {
-        const history = await apiClient("/chat/history");
-        if (history && history.length > 0) {
-          const formatted = history.map(h => ({
-            from: h.sender === "ai" ? "bot" : "user",
-            text: h.message
-          }));
-          setMessages(formatted);
-        }
-      } catch (err) {
-        console.error("Failed to load chat history:", err);
-      }
-    };
-    fetchHistory();
   }, []);
 
   useEffect(() => {
@@ -79,14 +67,7 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Chat Button */}
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 z-50 rounded-full bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-lg"
-      >
-        Chat
-      </button>
-
+      {/* Removed floating Chat button – chat opens automatically */}
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
@@ -100,7 +81,16 @@ export default function ChatWidget() {
                   Ask anything about mom & baby care
                 </div>
               </div>
-              <button onClick={() => setOpen(false)}>✕</button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => navigate("/chat/history")}
+                  className="flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
+                >
+                  <History className="h-3.5 w-3.5" />
+                  History
+                </button>
+                <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
+              </div>
             </div>
 
             {/* Lottie */}
