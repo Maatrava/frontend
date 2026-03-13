@@ -1,5 +1,9 @@
 import React, { useState } from "react";
+<<<<<<< HEAD
 import { Menu, Bell, User } from "lucide-react";
+=======
+import { Menu, Bell, User} from "lucide-react";
+>>>>>>> feat/auth-module
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
@@ -47,26 +51,28 @@ export default function Navbar() {
         <div className="sm:hidden border-t border-gray-800">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link
+<<<<<<< HEAD
               to="/profile"
               className="block px-3 py-2 rounded-md hover:bg-gray-200 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Profile
+=======
+              to="/home"
+              className="block px-3 py-2 rounded-md hover:bg-gray-800 transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Home
+>>>>>>> feat/auth-module
             </Link>
 
-            <a
-              href="#"
+            <Link
+              to="/saved-articles"
               className="block px-3 py-2 rounded-md hover:bg-gray-800 transition-colors"
+              onClick={() => setIsMenuOpen(false)}
             >
-              Menu Item 2
-            </a>
-
-            <a
-              href="#"
-              className="block px-3 py-2 rounded-md hover:bg-gray-800 transition-colors"
-            >
-              Menu Item 3
-            </a>
+              Saved Articles
+            </Link>
           </div>
         </div>
       )}

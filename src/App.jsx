@@ -12,7 +12,10 @@ import Articles from "./pages/Articles";
 import SavedArticles from "./pages/SavedArticles";
 import AppLayout from "./layouts/AppLayout";
 
+<<<<<<< HEAD
 import PreferredLanguage from "./pages/onBoarding/steps/PreferredLanguage";
+=======
+>>>>>>> feat/auth-module
 import BabyAge from "./pages/onBoarding/steps/BabyAge";
 import FeedingMethod from "./pages/onBoarding/steps/Feedingmethod";
 import DeliveryType from "./pages/onBoarding/steps/Deliverytype";
@@ -20,15 +23,19 @@ import HelpFocus from "./pages/onBoarding/steps/Helpfocus";
 import MotherForm from "./pages/MotherForm";
 import MotherMainDashboard from "./pages/MotherMainDashboard";
 import BabyModule from "./modules/babyModule/pages/BabyModule";
+<<<<<<< HEAD
 import AppointmentForm from "./pages/AppointmentForm";
 
+=======
+import SavedArticles from "./pages/SavedArticles";
+>>>>>>> feat/auth-module
 function App() {
   return (
     <Routes>
       {/* Public routes (no nav) */}
       <Route path="/login" element={<Login />} />
       <Route path="/signin" element={<Signin />} />
-      <Route path="/onboarding/language" element={<PreferredLanguage />} />
+
       <Route path="/onboarding/babyage" element={<BabyAge />} />
       <Route path="/onboarding/feeding" element={<FeedingMethod />} />
       <Route path="/onboarding/delivery" element={<DeliveryType />} />
@@ -47,10 +54,13 @@ function App() {
         <Route path="/mother-form" element={<MotherForm />} />
         <Route path="/appointments" element={<AppointmentForm />} />
         <Route path="/chat" element={<ChatWidget />} />
+<<<<<<< HEAD
         <Route path="/chat/history" element={<ChatHistory />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/articles" element={<Articles />} />
+=======
+>>>>>>> feat/auth-module
         <Route path="/saved-articles" element={<SavedArticles />} />
       </Route>
 
