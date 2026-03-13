@@ -3,7 +3,6 @@ import React, { createContext, useContext, useMemo, useState } from "react";
 const OnboardingContext = createContext(null);
 
 const initial = {
-  preferredLanguage: "",
   feedingType: "",
   babyAgeWeeks: 0,
   deliveryType: "",

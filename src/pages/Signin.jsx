@@ -3,6 +3,7 @@ import { LockKeyhole, User, Mail, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient from "../api/client";
 import { setAuthToken, setUserData } from "../auth/token";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +30,7 @@ export default function Signup() {
       if (response.user.onboardingCompleted) {
         navigate("/home");
       } else {
-        navigate("/onboarding/language");
+        navigate("/onboarding/babyage");
       }
     } catch (err) {
       setError(err);
@@ -137,17 +138,38 @@ export default function Signup() {
           </div>
 
           {/* Google Signup */}
-          <button
-            type="button"
-            className="w-full flex items-center justify-center gap-3 border rounded-xl py-3 text-sm font-medium shadow-sm hover:bg-gray-50"
-          >
-            <img
-              src="/google.png"
-              alt="Google"
-              className="w-5 h-5"
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                setLoading(true);
+                setError("");
+                try {
+                  const response = await apiClient("/auth/google", {
+                    body: { credential: credentialResponse.credential },
+                  });
+                  setAuthToken(response.token);
+                  setUserData(response.user);
+                  if (response.user.onboardingCompleted) {
+                    navigate("/home");
+                  } else {
+                    navigate("/onboarding/babyage");
+                  }
+                } catch (err) {
+                  setError("Google Login failed");
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              onError={() => {
+                setError("Google Login failed");
+              }}
+              useOneTap
+              theme="outline"
+              shape="pill"
+              text="signin_with"
+              width="384px"
             />
-            Sign up with Google
-          </button>
+          </div>
         </form>
 
         {/* Bottom link */}
