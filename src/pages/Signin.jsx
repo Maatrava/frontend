@@ -27,7 +27,7 @@ export default function Signup() {
       if (response.user.onboardingCompleted) {
         navigate("/home");
       } else {
-        navigate("/onboarding/language");
+        navigate("/onboarding/babyage");
       }
     } catch (err) {
       setError(err);

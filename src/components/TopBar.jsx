@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Menu, Bell, User} from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,26 +45,21 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="sm:hidden border-t border-gray-800">
           <div className="px-2 pt-2 pb-3 space-y-1">
-            <a
-              href="#"
+            <Link
+              to="/home"
               className="block px-3 py-2 rounded-md hover:bg-gray-800 transition-colors"
+              onClick={() => setIsMenuOpen(false)}
             >
-              Menu Item 1
-            </a>
+              Home
+            </Link>
 
-            <a
-              href="#"
+            <Link
+              to="/saved-articles"
               className="block px-3 py-2 rounded-md hover:bg-gray-800 transition-colors"
+              onClick={() => setIsMenuOpen(false)}
             >
-              Menu Item 2
-            </a>
-
-            <a
-              href="#"
-              className="block px-3 py-2 rounded-md hover:bg-gray-800 transition-colors"
-            >
-              Menu Item 3
-            </a>
+              Saved Articles
+            </Link>
           </div>
         </div>
       )}
